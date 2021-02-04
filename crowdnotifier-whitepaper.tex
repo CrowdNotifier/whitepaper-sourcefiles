@@ -1,0 +1,91 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{thmtools}
+\usepackage{booktabs}
+\usepackage{color}
+\usepackage{xspace}
+
+\usepackage{tablefootnote}
+
+\definecolor{cnblue}{RGB}{14,73,137}
+
+\usepackage[utf8]{inputenc}
+
+% Setup style to mimic our GoogleDocs style
+\usepackage[sfdefault,lining]{FiraSans} %% option 'sfdefault' activates Fira Sans as the default text font
+%\usepackage[fakebold]{firamath-otf}
+\usepackage[mathrm=sym]{unicode-math}
+\setmathfont{Fira Math}
+\usepackage[T1]{fontenc}
+\renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
+
+
+% Setup headers to be similar
+\usepackage{titlesec}
+\titleformat*{\section}{\fontsize{14pt}{21pt}\selectfont\bfseries\color{cnblue}}
+\titleformat*{\subsection}{\fontsize{14pt}{21pt}\selectfont\color{cnblue}}
+\titleformat*{\subsubsection}{\fontsize{13pt}{20pt}\selectfont\itshape\color{cnblue}}
+\renewcommand{\paragraph}[1]{\textbf{#1.}}
+\setcounter{secnumdepth}{2}
+
+\newcommand{\parait}[1]{\noindent\textit{#1}}
+
+\usepackage{setspace}
+\setstretch{1.15}
+
+\usepackage[parfill]{parskip}
+
+\usepackage{enumitem}
+\setlist{noitemsep}
+
+
+\usepackage{hyperref} 
+\usepackage{cleveref}
+
+\input{parts/00-macros}
+
+\begin{document}
+
+\begin{center}
+  \color{cnblue}
+  \fontsize{18pt}{27pt}\selectfont
+  % Title
+  {\bf\textsf{CrowdNotifier}}\\
+  % Subtitle
+  \fontsize{15pt}{22pt}\selectfont
+  Decentralized privacy-preserving presence tracing\\
+  % Version
+  \fontsize{11pt}{18pt}\selectfont
+  \textit{Version 8 October 2020}\\[11pt]
+  % Authors
+  \fontsize{12pt}{18pt}\selectfont
+  \textit{Wouter Lueks (EPFL), Seda Gürses (TU Delft), Michael Veale
+    (UCL), Edouard Bugnion (EPFL), Marcel Salathé (EPFL), Carmela Troncoso
+    (EPFL)}\\[11pt]
+  % Contact note
+  \fontsize{11pt}{15pt}\selectfont
+  \textit{Contact the first author for the latest version}\\[12pt]
+\end{center}
+
+% TODO: remove for camera-ready, but force page numbers for now
+% Force page numbering
+\thispagestyle{plain}
+\pagestyle{plain}
+
+\input{parts/executive-summary}
+\input{parts/motivation}
+\input{parts/terminology}
+\input{parts/overview}
+\input{parts/requirements}
+\input{parts/design}
+\input{parts/comparison}
+
+
+\end{document}

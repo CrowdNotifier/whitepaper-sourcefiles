@@ -1,0 +1,187 @@
+\section{Design}
+The proposed system consists of two parts: (1) a fall-back paper solution and (2) a digital solution using a smartphone application that scans QR codes. The existence of the fallback solution ensures compliance with F1. Both parts are decentralized, but the digital solution achieves better privacy properties.
+
+\subsection{Design choices}
+We made several design choices for the digital system to satisfy the above requirements.
+
+\parait{Optional action upon departure.} For the sake of useability (NF1) and robustness, the system will still function if users do not (or forget to) perform an action when leaving a venue. Instead, the system will use an estimate for the time people usually spend at this venue as default.
+
+\parait{(Semi-)Static QR codes for venues.} To ensure easy deployment for locations (NF2), venues and events can use static QR codes. As a result of this choice, PL2 becomes impossible to achieve. Users that visited a location at any time, can later confirm that this location was marked as a trace location; even if the user was not there on the same day/time.
+
+If protecting against this attack is essential, venues and organizers can instead generate new QR codes for every day or time-slot (for example, displaying them on screens). Requiring the user to have been present to determine whether the location is notified. Which is the best any system can do.
+
+\parait{Single-purpose: notify presence contacts.} The app does not retain a list of visited locations to aid contact tracers in their interview with a SARS-CoV-2-positive user. Instead — as is currently the norm — contact tracers must rely on interviews with the SARS-CoV-2-positive person to determine which locations that person visited, when and for how long.
+
+The system also does not facilitate contacting or identifying the owner of a location (e.g., a venue owner, or event organizer). Instead — as is currently the norm — contact tracers should rely on public records and information provided by the SARS-CoV-2-positive user to get in touch with the location owner.
+
+The single purpose of the system is to notify presence contacts.
+
+\parait{No network connections required when entering a location/event.} All necessary information is embedded in the QR code. This ensures the system works even when there is no Internet connection. Moreover, the system does not generate any observable network traffic when entering locations as a result.
+
+\parait{Regular polling by phones rather than push messages.} The use of push notification services such as Firebase requires that users enroll with and connect to 3rd party services. This is not necessary for our use case.
+
+\subsubsection{Non goals}
+
+\parait{Verification of attendance.} The system does not aim to provide contact tracers with a proof that a user has been at a location. As a result, users might lie about where they have been, potentially violating S2.
+
+\parait{Enforcing quarantines.} The system does not aim at providing authorities with the ability to enforce quarantine after notification. We assume that notified users will follow instructions from the health authorities with respect to the actions they should take.
+
+\subsubsection{Why not just use the GAEN framework?}
+Doesn’t the GAEN framework already offer precisely what is needed to do this type of colocation tracing?
+ 
+No — to use the GAEN framework, locations must operate infrastructure (violating NF2). In particular, locations must operate one or more Bluetooth beacons that transmit RPIs as in the GAEN framework. (And, modifications are necessary to ensure that any mobile device inside the location will detect the transmitted RPIs as “close”, and to mitigate individuals not inside the location (e.g. in a flat upstairs, or a neighbouring establishment, from too easily registering these modified signals.)
+
+\subsection{A fallback solution: pen \& paper}
+To satisfy the requirement for a paper-based fallback solution for visitors that do not have or want to use the app (F1), we present a fallback pen \& paper solution. This solution also serves as a baseline for the proposed digital solution.
+
+This approach works as follows:
+
+\begin{enumerate}
+\item A location keeps a box/list per day or time-slot.
+\item Every visitor enters contact information (e.g., name and phone number) into the box/list.
+\item Only when contact tracing reveals that a SARS-CoV-2-positive person visited a location during a specific time: the authorities receive the corresponding list \& contact every presence contact on this list.
+\item After 14 days, the boxes/lists are destroyed.
+\end{enumerate}
+
+Pros/cons:
+\begin{itemize}
+\item[+] No central list of information about who visited which location (PU1)
+\item[+] Easy to use for users (NF1)
+\item[+] Easy to use/deploy for locations (NF2)
+\item[+] Fast notification and no bandwidth requirements (NF3 \& NF4)
+\item[+] No privacy reductions through network traffic (there is none) (PU4 \& PU5)
+\item[+] No information on phone that can be exploited (PU3)
+\item[+] Population control requires cooperation of owners/organisers and health authorities (S2)
+\item[+] Automatic dismantling (S3)
+\item[-] Personal data is available locally at the locations (PU2)
+\item[-] ``System''/contact-tracers learn locations of presence contacts (PU1)
+\item[-] ``System''/contact-tracers can target individuals (S1)
+\end{itemize}
+
+\subsection{Digital presence tracing}
+
+
+
+The digital presence tracing solution works as follows. We assume that users have the corresponding app installed on their phone.
+
+\paragraph{Setup} The health authority generates a public-private encryption key pair $\pkH, \skH$; a cyclic group $\group$ of prime order $\grouporder$ with generator $\generator$; and a public hash function $\hash$.
+
+\paragraph{QR Code Generation} A location takes as input the name and location (e.g., address) of the event, and generates a set of QR codes as follows:
+It picks a random value salt and derives a private key $\sk$ by committing to the name and location by computing
+\begin{equation*}
+	\sk = \hash( \locationname \parallel \locationlocation \parallel \salt ).
+\end{equation*}
+
+It computes the corresponding public key $\pk = \generator^{\sk}$ and it picks a random symmetric key \notificationkey.
+It constructs three QR codes:
+  \begin{align*}
+    \qrentry &= \qrcode(\textsf{``entry''} \parallel \pk \parallel \notificationkey \parallel \defaulttime) \\
+    \qrexit &= \qrcode(\textsf{``exit''} \parallel \pk ) \\
+    \qrtrace &= \qrcode(  \enc(\pkH, \locationname \parallel \locationlocation \parallel \salt \parallel \notificationkey)  )
+  \end{align*}
+and prints them. The codes \qrentry and \qrexit are pasted at the entrance(s) of the venue. The code \qrtrace is kept private by the organizer.
+
+The private key $\sk$ is needed to perform any type of presence tracing. The data needed to recompute it are stored in an encrypted form in \qrtrace. Cooperation of the health authority is needed to decrypt these values.
+
+The notification key \notificationkey is used to encode messages by the health authority so that they can only be decrypted by apps of users that actually visited the corresponding location. This protection is not perfect. Anybody that knows or learns \notificationkey can subsequently make it public.
+
+The commitment trick used to compute the private key $\sk$ ensures that the private key is bound to the name and location of the venue, enabling the health authority to verify that they publish the correct key after decrypting \qrtrace.
+
+\parait{Safely generating the QR codes.} It is essential that the salt is only known to the venue owner. Therefore, these QR codes cannot be generated server-side. We propose to use client-side JavaScript to statelessly generate PDFs containing the QR codes. This PDF should contain three pages:
+\begin{itemize}
+\item A page that includes the entry QR code \qrentry, with clear instructions labeling this as the entry code, explanations of fall backs, and the name of the location.
+\item A page that includes the entry QR code \qrexit, with clear instructions.
+\item A page with the tracing QR code \qrtrace.
+\end{itemize}
+
+The QR code should encode a URL that opens the app directly, without generating further network traffic.
+
+\paragraph{Entering/leaving a venue} Upon entering a venue, the user uses their app to scan the corresponding entry QR code. Let $\pk$ be the public key in the QR code and \defaulttime the default time we assume people stay at the venue. The app:
+\begin{enumerate}
+\item Picks a random value $r \mod \grouporder$.
+\item Computes 
+  \begin{equation}
+    (\generator^r, \pk^r, \enc(\pk, \arrivaltime \parallel \notificationkey \parallel \defaulttime))
+  \end{equation}
+\end{enumerate}
+and stores this tuple together with a label for the current day.
+
+Optionally, upon leaving the venue users can scan the exit QR code, the app behaves as before, but then stores $\enc(\pk, \departuretime \parallel \textsf{``departure''})$ as ciphertext instead.
+
+These steps compute a Diffie-Hellman key exchange between the user’s device, holding private key $r$ and public key $\generator^r$ and the venue’s public key $\pk$. The resulting shared key is $\pk^r$. The user’s device only stores the public key $g^r$ and the shared key $\pk^r$.
+
+The stored tuples are constructed in such a way that they hide which venue the user visited to everybody that does not know the private key $\sk$ corresponding to the public key $\pk$ of the venue. (Assuming the DDH assumption holds in $\group$.)
+
+Devices automatically delete any entry older than 10 days.
+
+\paragraph{Initiating contact tracing}
+After the contact tracing team of the local health authority has determined that a SARS-CoV-2-positive person has visited a location during the contagious period, they proceed as follows. Let entry+ and exit+ the times that the SARS-CoV-2-positive person entered and exited this location.
+\begin{enumerate}
+\item The contact tracing team creates a case number to manage locations related to this patient.
+\item They then contact the owner/organiser of the location and request upload of the data in \qrtrace to the health authority’s server using the given case code. To do so, the owner/organizer scans the QR code with their app, enters the case code, and approves the data upload to the health authority’s server.
+\item The health authority’s server decrypts the uploaded data to recover name, location, salt and \notificationkey.
+\item The contact tracing team checks that all uploaded information from the tracing codes (in particular, the name and location) corresponds to the locations the SARS-CoV-2-positive person visited. They remove any extra uploads under this case code.
+\item For each approved upload $\locationname \parallel \locationlocation \parallel \salt \parallel \notificationkey$, the health backend server recomputes $\sk$ as above. It encrypts a message $\ctxtmsg$ to the user using $\notificationkey$ and publishes the recomputed $\sk$ together with the corresponding entry and exit times and $\ctxtmsg$.
+\item Finally, the owner/organizer generates new QR codes as per Setup above and removes the old codes from the venue.
+\end{enumerate}
+
+The check performed in step 4 and the subsequent recomputation of $\sk$ in step 5 ensures that a malicious or coerced venue owner cannot substitute the QR code of another location without this being detectable by the health authority.
+
+\paragraph{Presence tracing and notification.}
+The user’s app regularly (say, every few hours) performs the following checks:
+\begin{enumerate}
+\item The app downloads all $(\sk, \entryprime, \exitprime, \ctxtmsg)$ tuples that were published since the last time it checked.
+\item For each $(\sk, \entryprime, \exitprime, \ctxtmsg)$ tuple downloaded, the app proceeds as follows.
+  \begin{enumerate}
+    \item It finds all matching entry records for the day corresponding to entry+ and exit+. That is, for every stored tuple $(h, k, c)$ (corresponding to the values $(\generator^r, \pk^r, c)$ stored earlier); the app selects records where $h^\sk$ matches $k$.
+    \item For all matching records, the app decrypts the ciphertext $c$ using $\sk$ to recover corresponding entry/exit times, default times in the venue, and the \notificationkey.
+    \item The app uses these times (using the default time if no departure time is recorded) to determine if the user’s presence at the venue overlaps with the time the SARS-CoV-2-positive user was at the venue. If there is overlap, the app decrypts $\ctxtmsg$ using the recovered key \notificationkey and notifies the user by displaying this message.
+  \end{enumerate}
+\end{enumerate}
+  
+\subsubsection{Functionality analysis}
+\parait{F1.} See above. Using paper-based fallback solution.
+
+\parait{F2 \& F3.} The digital system keeps track of accurate entry times. Therefore, everybody that potentially overlaps with the SARS-CoV-2-positive user at a location can be notified. Satisfying F2. Moreover, if users scan exit codes (or if default duration of a visit is representative) users will not be notified if they did not overlap with SARS-CoV-2-positive user. Largely satisfying F3.
+
+\parait{NF1.} Users only need to scan a QR code upon entry (and optionally departure) of a location. No other actions are required.
+
+\parait{NF2.} Locations do not require additional infrastructure.
+
+\parait{NF3.} Presence contacts are notified within hours of contact tracers obtaining the required information from the location owner/organizer.
+
+\parait{NF4.} The bandwidth costs are very small. Less than 256 bytes per location that is marked as a trace location (depending on the length of the supplied message).
+
+\subsubsection{Security and privacy analysis}
+
+\parait{PU1 \& PU2.} There is no central collection of private data related to users. There is also no data collection at the venue (apart from the fallback method). Therefore PU1 \& PU2 are satisfied.
+
+\parait{PU3.} Provided that the venue owner (or event organiser) and the health authority do not collude, location confirmation attacks against data stored on the phone are not possible as long as a location is not marked as a trace location.
+
+As argued above, the sk corresponding to a venue is needed to confirm a location. This value is held in encrypted form by the venue owner, and can only be decrypted by the health authority. Therefore, an attacker needs to coerce (or collude with) both the venue owner and the health authority and gain access to a user’s phone to perform a confirmation attack.
+
+\parait{PU4 \& PU5.} The system does not generate any sensitive network traffic. All phones download information from the backend server. None of them ever send any information.
+
+\parait{PL1.} To confirm that a location is a trace location, the adversary needs to know the corresponding public key pk. This value is on the QR code at the entrance to the venue. Since non-visitors do not know this value, PL1 is normally satisfied. However, malicious visitors can publish the association between pk and a location to enable confirmation attacks.
+
+\parait{PL2.} PL2 is not satisfied, unless the venue owner generates new QR codes for every day or time-slot.
+
+\parait{PL3.} PL3 is satisfied. The system does not generate nor rely on the creation of any central database related to venue owners or event organisers.
+
+\parait{S1.} Individual users cannot be targeted. Any published tracing information will always target all visitors to a specific location.
+
+\parait{S2.} To target a location requires (1) having access to the private key sk corresponding to that location and (2) convincing the health authority to publish it.
+
+The private key sk key is only available by decrypting the information stored in \qrtrace. This requires coercing/corrupting the venue owner and coercing/corrupting/tricking the health authority.
+
+The protocol has been designed to make it difficult to trick the health authority in publishing any sk that does not correspond to a trace location. In particular, the check performed in step 4 ensures that any malicious uploads of \qrtrace for the wrong venue will be detected.
+
+However, the system in its current form does not protect against SARS-CoV-2-positive people maliciously claiming to have been in a venue in order to get that venue to be marked as a trace location.
+
+\parait{S3.} The system gracefully dismantles itself as soon as users and/or venue owners and event organizers stop using it. As soon as the users stop scanning QR codes, no new data will be stored by their apps. As a result, old data is automatically deleted after 10 days. From that point onward, users cannot be notified anymore. Uninstalling the app has the same effect.
+
+As soon as venue owners stop generating/displaying QR codes, no visitors to their location/events can be notified anymore. In fact, venue owners can retroactively achieve this by destroying the tracing QR code.
+
+The health authority does maintain the decryption key needed to recover the data stored in the tracing QR code. A malicious operator that fails to destroy this key voluntarily can reduce the guarantees surrounding PU3: the guarantee now only holds as long as the venue owner remains honest or destroyed the tracing QR code. 
+
+Beyond this decryption key, all other data is made public. No private or sensitive data is stored centrally. Therefore, the system will gracefully dismantle itself.

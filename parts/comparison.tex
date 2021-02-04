@@ -1,0 +1,66 @@
+\section{Other approaches to presence tracing}
+
+We compare the approach proposed in this document with two alternative approaches: a centralized system that tracks which locations users visited; and a decentralized system that uses a central database with location information. Both of these approaches have been deployed by national governments.
+
+\subsection{Centralized Presence Tracing}
+Centralized presence tracing systems use a central database to keep track of who visited which locations when. Notification of users then proceeds based on centrally available data.
+
+This approach is for example used by the Singaporean SafeEntry System. Whenever a user enters/exits a location, this location scans either the QR code on the user’s TraceTogether token or the barcode on the user’s national ID card. Both encode a pseudonym for the user (e.g., in the case of the national ID card this is the card’s number). Presumably, this information is shared with backend infrastructure to record entry and departure times.
+
+\subsubsection{Evaluation}
+Because of the centralized design, it is easy to target individuals (violating S1), do crowd control (violating S2) and dismantling requires active actions on behalf of the system operator (violates S3).
+
+Privacy-oriented versions of this design do not need to store personal data on the location (PU2 mostly satisfied), nor on the phone (PU3 satisfied). However, to facilitate notification of presence contacts, the system relies on a central database with extensive personal information (PU1 violated). 
+
+Location privacy is also limited. While the system does not necessarily reveal which locations were marked as a trace location (PL1 \& PL2 satisfied), the system does rely on a central location database to track who is where (violating PL3).
+
+\subsection{Abuse-prone Decentralized Presence Tracing}
+An alternative approach is to build a decentralized presence notification system where users record — on their phone — which locations they visit. No central database of visits is created. Instead, health authorities broadcast identifiers of trace locations whenever they identify them. The user’s phone then notifies users.
+
+This approach is for example used as part of the New Zealand NZ Tracer App system. Locations generate a QR code that they place at the entrance of their venue. Visitors scan this QR code with the NZ Tracer App when they enter the venue. The app locally stores a record of the visited location and time of visit.
+
+As part of generating a QR code, venue owners (or managers) need to identify themselves, the venue, and provide contact data. These data are used by contact tracers to contact the venue owners.
+
+\subsubsection{Evaluation}
+Because of the decentralized approach it is not possible to target individuals (S1 satisfied). However, crowd control is still possible, as notification only depends on the central health authority (violating S2). Dismantling also requires active action by the system operator to remove the database of location information (violating S3).
+
+No personal data about users is stored at a central database (satisfying PU1) or the location (satisfying PU2). However, the phone stores a list of the locations that the user has visited, and this list is not protected (violating PU3).
+
+Only a random identifier needs to be published to mark a specific location as a trace location. Thus the identity of trace locations is hidden from non-visitors (satisfying PL1). Non-contemporal visitors of locations, however, can still determine whether a SARS-CoV-2-positive person visited a location that they also visited (even if that visit is not contemporal; violating PL2).
+
+Finally, the current NZ Tracer App system does build a central database of locations and venues, violating PL3. However, the existence of this database is not actually necessary in every decentralized system (instead contact tracers could obtain the required information from the location owner/event organiser directly).
+
+\subsection{Comparison}
+In Table~\ref{tab:comparison} we compare our approach with the two alternative approaches we described above with respect to the security and privacy requirements we identify above.
+
+\newcommand{\tableyes}{+}
+\newcommand{\tableno}{-}
+
+\clearpage
+\begin{table}[tb]
+ \centering
+ \newcommand{\tablebox}[1]{\parbox[t]{2.5cm}{\centering#1}}
+ \renewcommand{\arraystretch}{1.5}
+ \begin{tabular}{p{6cm}ccc}
+  \toprule
+  & \tablebox{Centralized\\System} & \tablebox{Naive\\Decentralized\\System} & Crowdnotifier  \\
+  \midrule
+  \multicolumn{4}{@{}l}{\emph{Privacy of Users}}\\
+  No central data collection (PU1) & \tableno & \tableyes & \tableyes \\
+  No data collection at location (PU2) & \tableyes & \tableyes & \tableyes \\
+  No location confirmation attacks given phone (PU3) & \tableyes & \tableno & \tableyes \\
+  No notification side channel (PU4) & unknown & \tableyes & \tableyes \\
+  No SARS-CoV-2-positive diagnosis side channel (PU5) & unknown & \tableyes & \tableyes \\
+  \multicolumn{4}{@{}l}{\emph{Confidentiality of locations}} \\
+  Hide trace locations from non-visitors (PL1) & \tableyes & \tableyes & \tableyes \\
+  Hide trace locations from non-contemporal visitors (PL2) & \tableyes & \tableno/\tableyes\tablefootnote{\label{table-foot:multiple}To obtain this property, venue owners and organisers need to generate multiple QR codes, e.g., per event or per day. While the current New Zealand implementation does not support this, comparable systems easily could.} & \tableno/\tableyes\textsuperscript{\ref{table-foot:multiple}} \\
+  No database of locations (PL3) & \tableno & \tableno/\tableyes\tablefootnote{The current New Zealand implementation uses this database. However, the system could function without this database.} & \tableyes \\
+  \multicolumn{4}{@{}l}{\emph{Security}} \\
+  No targeting of individuals (S1) & \tableno & \tableyes & \tableyes \\
+  No crowd control (S2) & \tableno & \tableno & \tableyes \\
+  Automatic dismantling (S4) & \tableno & \tableno & \tableyes \\
+  \bottomrule
+ \end{tabular}
+ \caption{Overview of properties of different presence tracing systems.}
+ \label{tab:comparison}
+\end{table}
