@@ -1,15 +1,14 @@
 \documentclass[a4paper,11pt]{article}
 
+\usepackage{microtype}
+\usepackage{newunicodechar}
 \usepackage[margin=1in]{geometry}
 
 \usepackage{graphicx}
-\usepackage{amsfonts}
 \usepackage{tabularx}
-\usepackage{amsmath}
-\usepackage{amsthm}
 \usepackage{thmtools}
 \usepackage{booktabs}
-\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{xspace}
 
 \usepackage{tablefootnote}
@@ -20,12 +19,19 @@
 
 % Setup style to mimic our GoogleDocs style
 \usepackage[sfdefault,lining]{FiraSans} %% option 'sfdefault' activates Fira Sans as the default text font
-%\usepackage[fakebold]{firamath-otf}
 \usepackage[mathrm=sym]{unicode-math}
 \setmathfont{Fira Math}
-\usepackage[T1]{fontenc}
 \renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
+\usepackage{FiraMono}
 
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{bbding}
+
+% there is no \bot in Fira Sans
+\AtBeginDocument{\renewcommand{\bot}{{\perp}}}
+\newunicodechar{⊥}{\bot}
 
 % Setup headers to be similar
 \usepackage{titlesec}
@@ -35,8 +41,6 @@
 \renewcommand{\paragraph}[1]{\textbf{#1.}}
 \setcounter{secnumdepth}{2}
 
-\newcommand{\parait}[1]{\noindent\textit{#1}}
-
 \usepackage{setspace}
 \setstretch{1.15}
 
@@ -45,11 +49,12 @@
 \usepackage{enumitem}
 \setlist{noitemsep}
 
-
 \usepackage{hyperref} 
 \usepackage{cleveref}
 
+\input{parts-formal/macros}
 \input{parts/00-macros}
+
 
 \begin{document}
 
@@ -63,23 +68,29 @@
   Decentralized privacy-preserving presence tracing\\
   % Version
   \fontsize{11pt}{18pt}\selectfont
-  \textit{Version 8 October 2020}\\[11pt]
+  \textit{Version 5 February 2021}\\[11pt]
   % Authors
   \fontsize{12pt}{18pt}\selectfont
   \textit{Wouter Lueks (EPFL), Seda Gürses (TU Delft), Michael Veale
-    (UCL), Edouard Bugnion (EPFL), Marcel Salathé (EPFL), Carmela Troncoso
-    (EPFL)}\\[11pt]
+    (UCL), Edouard Bugnion (EPFL), Marcel Salathé (EPFL), Kenneth G. Paterson (ETHZ), Carmela Troncoso (EPFL)}\\[11pt]
   % Contact note
   \fontsize{11pt}{15pt}\selectfont
   \textit{Contact the first author for the latest version}\\[12pt]
 \end{center}
 
-% TODO: remove for camera-ready, but force page numbers for now
 % Force page numbering
 \thispagestyle{plain}
 \pagestyle{plain}
 
 \input{parts/executive-summary}
+
+\newpage
+\tableofcontents
+
+\newpage
+\input{parts/changelog}
+
+\newpage
 \input{parts/motivation}
 \input{parts/terminology}
 \input{parts/overview}
@@ -87,5 +98,10 @@
 \input{parts/design}
 \input{parts/comparison}
 
+\bibliographystyle{plain}
+\bibliography{sources}
+
+\appendix
+\input{parts/appendix-ibe}
 
 \end{document}

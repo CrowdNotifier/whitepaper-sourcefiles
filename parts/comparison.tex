@@ -1,66 +1,100 @@
-\section{Other approaches to presence tracing}
+\section{Comparison with other Presence Tracing Systems}
 
-We compare the approach proposed in this document with two alternative approaches: a centralized system that tracks which locations users visited; and a decentralized system that uses a central database with location information. Both of these approaches have been deployed by national governments.
+We compare the security and privacy properties of \name with existing to
+existing and deployed presence tracing systems.
 
-\subsection{Centralized Presence Tracing}
-Centralized presence tracing systems use a central database to keep track of who visited which locations when. Notification of users then proceeds based on centrally available data.
+\subsection{Classes of Existing Presence-Tracing Systems}
+\label{sec:existing-systems}
 
-This approach is for example used by the Singaporean SafeEntry System. Whenever a user enters/exits a location, this location scans either the QR code on the user’s TraceTogether token or the barcode on the user’s national ID card. Both encode a pseudonym for the user (e.g., in the case of the national ID card this is the card’s number). Presumably, this information is shared with backend infrastructure to record entry and departure times.
+We classify existing presence tracing systems based on where they store data related to a user's visit to a venue or event. We identify three ways of storing these data: at the visited location, at a central server, or on the user's device. Depending on how these data are stored, notification happens in different ways. 
 
-\subsubsection{Evaluation}
-Because of the centralized design, it is easy to target individuals (violating S1), do crowd control (violating S2) and dismantling requires active actions on behalf of the system operator (violates S3).
+While we list examples for each of these categories, we are by no means exhaustive. During the early months of the COVID-19 pandemic, a large number of private initiatives aimed at replacing and digitizing pen-and-paper based systems. For example, Chen mentions over 30 different presence tracing systems in New Zealand alone~\cite{Chen20} before the government stepped in and provided the NZ COVID Tracer system. All systems provide the following procedures: \emph{setup} of a location, \emph{recording} a visit, \emph{initiating notification}, and \emph{notification} of visitors.
 
-Privacy-oriented versions of this design do not need to store personal data on the location (PU2 mostly satisfied), nor on the phone (PU3 satisfied). However, to facilitate notification of presence contacts, the system relies on a central database with extensive personal information (PU1 violated). 
+\para{Data stored at the location} These systems store records of visits at the location itself. Paper based sign-in sheets are a good example of such a system.
 
-Location privacy is also limited. While the system does not necessarily reveal which locations were marked as a trace location (PL1 \& PL2 satisfied), the system does rely on a central location database to track who is where (violating PL3).
+To set up a location, the location owner creates a blank sign-in sheet. People that visit the location write their contact details and arrival time on this sheet. When the health authorities determine that visitors of this location for a specific time slot should be notified, they initiate notification by requesting the attendance list from the location owner. The authority notifies relevant visitors using the contact information on the sheet.
 
-\subsection{Abuse-prone Decentralized Presence Tracing}
-An alternative approach is to build a decentralized presence notification system where users record — on their phone — which locations they visit. No central database of visits is created. Instead, health authorities broadcast identifiers of trace locations whenever they identify them. The user’s phone then notifies users.
+We also consider in this class ad-hoc location-specific digital attendance lists. For example, location owners recording contact information on a physical device or online record they own, and only they can access.
 
-This approach is for example used as part of the New Zealand NZ Tracer App system. Locations generate a QR code that they place at the entrance of their venue. Visitors scan this QR code with the NZ Tracer App when they enter the venue. The app locally stores a record of the visited location and time of visit.
+\para{Data stored at a central server} These systems store records of visits at a central server that manages many locations. The Singaporean SafeEntry System~\cite{safeentry} and the Swiss SocialPass~\cite{socialpass} are examples of such systems.
 
-As part of generating a QR code, venue owners (or managers) need to identify themselves, the venue, and provide contact data. These data are used by contact tracers to contact the venue owners.
+To set up a location, the location owner registers with the central service, usually providing a description and contact information of the location. Upon visiting a location, visitors record their visit and contact information at the central server. For instance:
+\begin{enumerate}[topsep=0pt, partopsep=0pt]
+\item Users enters their data on a web site, e.g, by opening the website by scanning a QR code provided by the location, as in the La Rioja COVID system~\cite{larioja}; or
+\item Users use a system-specific app to register visits and transmit their contact information, for instance, by scanning an app-specific QR code as in SocialPass; or
+\item The location owner records the user's visit into the central system directly, for instance using a special app to scan ID cards of visitors as in SafeEntry.
+\end{enumerate}
+To initiate tracing, health authorities request a excerpt of the visitor log from the location owner, and use that information to notify the relevant visitors.
 
-\subsubsection{Evaluation}
-Because of the decentralized approach it is not possible to target individuals (S1 satisfied). However, crowd control is still possible, as notification only depends on the central health authority (violating S2). Dismantling also requires active action by the system operator to remove the database of location information (violating S3).
+\para{Data stored on user's device} These systems store visits records on the user's device. The New Zealand NZ COVID system and the UK NHS COVID App system are good examples of this.
 
-No personal data about users is stored at a central database (satisfying PU1) or the location (satisfying PU2). However, the phone stores a list of the locations that the user has visited, and this list is not protected (violating PU3).
+To set up a location, the location owner registers with the central service and they receive a location identifier, usually in the form of a QR code. When users visit the location, they use the corresponding app to scan this code, and store a local record on their phone. To initiate notification, health authorities find the corresponding location in their database and broadcast the location identifier to all apps. Apps verify locally whether they visited the location, and notify the user if yes.
 
-Only a random identifier needs to be published to mark a specific location as a trace location. Thus the identity of trace locations is hidden from non-visitors (satisfying PL1). Non-contemporal visitors of locations, however, can still determine whether a SARS-CoV-2-positive person visited a location that they also visited (even if that visit is not contemporal; violating PL2).
 
-Finally, the current NZ Tracer App system does build a central database of locations and venues, violating PL3. However, the existence of this database is not actually necessary in every decentralized system (instead contact tracers could obtain the required information from the location owner/event organiser directly).
 
-\subsection{Comparison}
-In Table~\ref{tab:comparison} we compare our approach with the two alternative approaches we described above with respect to the security and privacy requirements we identify above.
 
-\newcommand{\tableyes}{+}
-\newcommand{\tableno}{-}
 
-\clearpage
-\begin{table}[tb]
+\subsection{Evaluation of Existing Systems}
+\label{sec:evaluation-existing}
+We evaluate the three types of systems introduced above against the requirements
+from the Section~\ref{sec:requirements}. See Table~\ref{tab:comparison} for a summary. Since none of these systems process information about SARS-CoV-2-positive users, PU5 is satisfied for all of them.
+
+\begin{table*}[tbp]
+ \footnotesize
  \centering
- \newcommand{\tablebox}[1]{\parbox[t]{2.5cm}{\centering#1}}
- \renewcommand{\arraystretch}{1.5}
- \begin{tabular}{p{6cm}ccc}
-  \toprule
-  & \tablebox{Centralized\\System} & \tablebox{Naive\\Decentralized\\System} & Crowdnotifier  \\
+ \newcommand{\tablebox}[1]{\parbox[t]{1.4cm}{\centering#1}}
+ \renewcommand{\tablebox}[1]{#1}
+ \renewcommand{\arraystretch}{1.35}
+ \begin{tabular}{lp{8cm}cccc}
+   \toprule
+   & & \multicolumn{3}{c}{Existing Classes of Systems} & \\
+   \cmidrule{3-5}
+   & & Store at & Store at & Store at \\
+   & & Location & Server   & Phone    & \name \\
   \midrule
   \multicolumn{4}{@{}l}{\emph{Privacy of Users}}\\
-  No central data collection (PU1) & \tableno & \tableyes & \tableyes \\
-  No data collection at location (PU2) & \tableyes & \tableyes & \tableyes \\
-  No location confirmation attacks given phone (PU3) & \tableyes & \tableno & \tableyes \\
-  No notification side channel (PU4) & unknown & \tableyes & \tableyes \\
-  No SARS-CoV-2-positive diagnosis side channel (PU5) & unknown & \tableyes & \tableyes \\
+  & No central data collection (PU1) & \tableyes & \tableno & \tableyes & \tableyes \\
+  & No data collection at location (PU2) & \tableno & \tableyes & \tableyes & \tableyes \\
+  & No location confirmation attacks given phone (PU3) & \tableyes & \tableyes & \tableno & \tableyes \\
+  & No notification side channel (PU4) & unknown & unknown & \tableyes & \tableyes \\
+  & No SARS-CoV-2-positive diagnosis side channel (PU5) & \tableyes & \tableyes & \tableyes & \tableyes \\[1mm]
   \multicolumn{4}{@{}l}{\emph{Confidentiality of locations}} \\
-  Hide trace locations from non-visitors (PL1) & \tableyes & \tableyes & \tableyes \\
-  Hide trace locations from non-contemporal visitors (PL2) & \tableyes & \tableno/\tableyes\tablefootnote{\label{table-foot:multiple}To obtain this property, venue owners and organisers need to generate multiple QR codes, e.g., per event or per day. While the current New Zealand implementation does not support this, comparable systems easily could.} & \tableno/\tableyes\textsuperscript{\ref{table-foot:multiple}} \\
-  No database of locations (PL3) & \tableno & \tableno/\tableyes\tablefootnote{The current New Zealand implementation uses this database. However, the system could function without this database.} & \tableyes \\
+  & Hide trace locations from non-visitors (PL1) & \tableyes & \tableyes & \tableyes & \tableyes \\
+  & Hide trace locations from non-contemporal visitors (PL2) & \tableyes &  \tableyes & \tableno/\tableyes & \tableno/\tableyes \\
+  & No database of locations (PL3) & \tableyes & \tableno & \tableno/\tableyes & \tableyes \\[1mm]
   \multicolumn{4}{@{}l}{\emph{Security}} \\
-  No targeting of individuals (S1) & \tableno & \tableyes & \tableyes \\
-  No crowd control (S2) & \tableno & \tableno & \tableyes \\
-  Automatic dismantling (S4) & \tableno & \tableno & \tableyes \\
-  \bottomrule
+  & No targeting of individuals (S1) & \tableno & \tableno & \tableyes & \tableyes \\
+  & No crowd control (S2) & \tableyes & \tableno & \tableno & \tableyes \\
+  & Automatic dismantling (S3) & \tableyes & \tableno & \tableno & \tableyes \\
+   \bottomrule
  \end{tabular}
- \caption{Overview of properties of different presence tracing systems.}
+ \caption{Comparison of three classes of existing presence tracing systems --
+   classified by where they store data related to visits -- with \name. Whenever
+   a class does not currently achieve a property, but could achieve it, we mark
+   the cell with ``{\footnotesize \tableno / \tableyes}''}
  \label{tab:comparison}
-\end{table}
+\end{table*}
+
+
+\para{Data stored at the location}
+No data related to visits is stored centrally nor on the user's phone (PU1 and PU3 satisfied). However, visit records are stored locally (violating PU2). The means to notify users is implementation specific (PU4 unknown).
+
+The system only reveals trace locations to contemporary visitors (PL1 and PL2 satisfied), and does not require a database of locations (PL3 satisfied).
+
+For security, the health authority can easily target individual users (S1 not satisfied), but requires cooperation of the location owner to target crowds (S2 satisfied). The system automatically dismantles itself as soon as owners stop keeping lists, or users stop recording their presence on these lists (S3 satisfied).
+
+\para{Data stored at a central server}
+Privacy-oriented versions of this design do not need to store personal data on the location (PU2 mostly satisfied), nor on the phone (PU3 satisfied). However, to notify presence contacts, the system relies on a central database with extensive personal information (PU1 violated). 
+
+Location privacy is limited. While the system does not necessarily reveal which locations were marked as a trace location (PL1 \& PL2 satisfied), the system does rely on a central location database to track who is where (violating PL3).
+
+Because of the centralized design, it is easy to target individuals (violating S1), do crowd control (violating S2) and dismantling requires active actions by the system operator to remove the location database (violating S3).
+
+\para{Data stored on user's device}
+In this approach, the central database does not store any personal data about users (satisfying PU1) or the location (satisfying PU2). The phone stores a list of the locations that the user has visited, and this list is not protected (violating PU3).
+
+Only a random identifier needs to be published to mark a specific location as a trace location. Thus the identity of trace locations is hidden from non-visitors (satisfying PL1). Non-contemporal visitors of locations, however, can still determine whether a SARS-CoV-2-positive person visited a location that they also visited. Locations can avoid this by using one-time registrations (PL2 not satisfied by default, but could be).
+
+The current NZ Tracer App and UK NHS COVID App systems do build a central database of locations and venues, violating PL3. However, the existence of this database is not actually necessary in every decentralized system (PL3 not satisfied, but could be).
+
+Finally, it is not possible to target individuals (S1 satisfied). However, crowd control is still possible, as notification only depends on the central health authority (violating S2). Dismantling requires active action by the system operator to remove the database of location information (violating S3).

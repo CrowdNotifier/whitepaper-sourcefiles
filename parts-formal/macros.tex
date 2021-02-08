@@ -1,0 +1,131 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Formatting macros %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\newcommand{\para}[1]{\vspace{1mm}\noindent\textbf{#1.}} % starts a paragraph with bold title
+\newcommand{\parabit}[1]{\vspace{1mm}\noindent\textbf{\textit{#1.}}}
+\newcommand{\parait}[1]{\noindent\textit{#1.}} % starts a paragraph with italics
+
+
+% \setlist[description]{leftmargin=\parindent}
+% \setlist[enumerate,1]{leftmargin=17pt}
+
+\newcommand{\name}{CrowdNotifier\xspace}
+
+\newcommand{\code}[1]{\textsf{#1}\xspace}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%% Scheme macros %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+% Setup
+\newcommand{\setup}{\code{Setup}}
+\newcommand{\secpar}{\ell}
+\newcommand{\pp}{\code{pp}}
+
+% Generating information used for tracing
+\newcommand{\gencode}{\code{GenCode}}
+\newcommand{\info}{\code{info}}
+\newcommand{\entry}{\code{ent}}
+\newcommand{\entryproof}{\pi_{\entry}}
+\newcommand{\trace}{\code{tr}}
+\newcommand{\traceh}{\code{tr}_{\hourctr}}
+\newcommand{\traceproof}{\pi_{\trace}}
+
+% Creating a record
+\newcommand{\scan}{\code{Scan}}
+\newcommand{\rec}{\code{rec}}
+\newcommand{\aux}{\code{aux}}
+
+% Verifying 
+\newcommand{\verifytrace}{\code{VerifyTrace}}
+
+% Matching
+\newcommand{\match}{\code{Match}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%% Crypto macros %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\newcommand{\bins}{\{0,1\}^*}
+
+% Copied from whitepaper
+\newcommand{\group}{G}
+\newcommand{\generator}{g}
+\newcommand{\grouporder}{p}
+\newcommand{\Zp}{\mathbb{Z}_p}
+\newcommand{\pk}{pk}
+\newcommand{\pkH}{\pk_{H}}
+\newcommand{\sk}{sk}
+\newcommand{\skH}{\sk_{H}}
+\newcommand{\hash}{H}
+\newcommand{\hashq}{H_{\grouporder}}
+
+\newcommand{\keygen}{\code{KeyGen}}
+\newcommand{\enc}{\code{Enc}}
+\newcommand{\dec}{\code{Dec}}
+
+% System macros from white paper
+\newcommand{\qrbase}[1]{\ensuremath{\code{QR}_{\code{#1}}}\xspace}
+\newcommand{\qrentry}{\qrbase{entry}}
+\newcommand{\qrexit}{\qrbase{exit}}
+\newcommand{\qrtrace}{\qrbase{trace}}
+\newcommand{\qrcode}{\code{QRCode}}
+
+\newcommand{\tracelist}{\code{TR}_\code{list}}
+
+% For v2 of the scheme
+\newcommand{\mastertrace}{\code{mtr}}
+\newcommand{\mastertracevenue}{\mastertrace_{\code{V}}}
+\newcommand{\mastertracehealth}{\mastertrace_{\code{HA}}}
+\newcommand{\counter}{\code{cnt}}
+
+\newcommand{\gentrace}{\code{GenTrace}}
+\newcommand{\genpretrace}{\code{GenPreTrace}}
+\newcommand{\setupHA}{\code{SetupHA}}
+\newcommand{\genTraceAndVerify}{\code{GenTraceAndVerify}}
+
+\newcommand{\mastersk}{\code{msk}}
+\newcommand{\masterskvenue}{\mastersk_{\code{L}}}
+\newcommand{\masterskhealth}{\mastersk_{\code{HA}}}
+
+\newcommand{\masterpk}{\code{mpk}}
+\newcommand{\masterpkvenue}{\code{mpk}_{\code{L}}}
+\newcommand{\masterpkhealth}{\code{mpk}_{\code{HA}}}
+
+\newcommand{\ctxtha}{\ctxt_{\code{HA}}}
+
+\newcommand{\nonce}{\code{nonce}}
+\newcommand{\ctxt}{\code{ctxt}}
+
+\newcommand{\pretrace}{\code{ptr}}
+\newcommand{\pretraceproof}{\pi_{\code{ptr}}}
+
+% Internal crypto macros
+\newcommand{\pairsym}{e}
+
+% Authenticated Encryption
+\newcommand{\aegen}{\code{AE.Gen}}
+\newcommand{\aeenc}{\code{AE.Enc}}
+\newcommand{\aedec}{\code{AE.Dec}}
+
+% IBE scheme
+\newcommand{\ibecommonsetup}{\code{IBE.CommonSetup}}
+\newcommand{\ibekeygen}{\code{IBE.KeyGen}}
+\newcommand{\ibekeyder}{\code{IBE.KeyDer}}
+\newcommand{\ibeenc}{\code{IBE.Enc}}
+\newcommand{\ibedec}{\code{IBE.Dec}}
+
+\newcommand{\id}{\code{id}}
+\newcommand{\skid}{\code{sk}_{\id}}
+\newcommand{\skidh}{\code{sk}_{\id,\hourctr}}
+
+\newcommand{\preskid}{\code{psk}_{\id}}
+\newcommand{\preskidvenue}{\code{psk}_{\id}^{\code{L}}}
+\newcommand{\preskidvenueh}{\code{psk}_{\id,\hourctr}^{\code{L}}}
+\newcommand{\preskidhealth}{\code{psk}_{\id}^{\code{HA}}}
+\newcommand{\preskidhealthh}{\code{psk}_{\id,\hourctr}^{\code{HA}}}
+
+

@@ -1,6 +1,7 @@
-\newcommand{\code}[1]{\textsf{#1}\xspace}
+\renewcommand{\code}[1]{\texttt{#1}\xspace}
+\renewcommand{\code}[1]{\textrm{\firalight #1}\xspace}
 
-\newcommand{\notificationkey}{\code{notification\_key}}
+\newcommand{\notificationkey}{\code{notifykey}}
 \newcommand{\defaulttime}{\code{default\_time\_in\_venue}}
 \newcommand{\arrivaltime}{\code{arrival\_time}}
 \newcommand{\departuretime}{\code{departure\_time}}
@@ -9,23 +10,23 @@
 \newcommand{\locationlocation}{\code{location}}
 \newcommand{\salt}{\code{salt}}
 
-\newcommand{\qrbase}[1]{\ensuremath{\code{QR}_{\code{#1}}}\xspace}
-\newcommand{\qrentry}{\qrbase{entry}}
-\newcommand{\qrexit}{\qrbase{exit}}
-\newcommand{\qrtrace}{\qrbase{trace}}
-\newcommand{\qrcode}{\code{QRCode}}
-
-\newcommand{\group}{G}
-\newcommand{\generator}{g}
-\newcommand{\grouporder}{p}
-\newcommand{\pk}{pk}
-\newcommand{\pkH}{\pk_{H}}
-\newcommand{\sk}{sk}
-\newcommand{\skH}{\sk_{H}}
-\newcommand{\hash}{H}
+% \newcommand{\group}{G}
+% \newcommand{\generator}{g}
+% \newcommand{\grouporder}{p}
+% \newcommand{\pk}{pk}
+% \newcommand{\pkH}{\pk_{H}}
+% \newcommand{\sk}{sk}
+% \newcommand{\skH}{\sk_{H}}
+% \newcommand{\hash}{H}
 
 \newcommand{\ctxtmsg}{c_{\textsf{msg}}}
-\newcommand{\entryprime}{\textsf{entry}'}
-\newcommand{\exitprime}{\textsf{exit}'}
+% \newcommand{\enc}{\textsf{Enc}}
 
-\newcommand{\enc}{\textsf{Enc}}
+\newcommand{\tableyes}{\Checkmark}
+\newcommand{\tableno}{\XSolidBrush}
+\newcommand{\tablesome}{\textasciitilde}
+
+\newcommand{\entryprime}{\code{entry'}}
+\newcommand{\exitprime}{\code{exit'}}
+\newcommand{\entryplus}{\code{entry'}}
+\newcommand{\exitplus}{\code{exit'}}

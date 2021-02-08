@@ -1,84 +1,111 @@
-\section{Requirements and properties}
+\section{Presence Tracing Requirements}\label{sec:requirements}
 
-The following is a preliminary list of requirements. This list might be incomplete. Also, the security and privacy requirements make some assumptions on the infrastructure. They are not necessarily complete wrt specific designs that use other infrastructure.
+In this section we describe the requirements that a presence tracing system should fulfil in order to meet epidemiological need while safeguarding privacy, providing checks on power and abuse, and minimising infrastructural impact after an emergency ends.
+
+
+We stress that we focus on \emph{notification of presence contacts} only. We make the following assumptions:
+\begin{itemize}[topsep=0pt, partopsep=0pt]
+\item The health authority is trusted to (1) determine which locations' visitors should be notified and (2) to trigger notification when required.
+\item The use of the tool by location owners and visitors is voluntary.
+\item The system does not need to enforce the adherence of users to their obligations once they are notified.
+\end{itemize} 
 
 \subsection{Functional requirements}
-Following the principles of data-minimization, we require that presence contacts are notified. However, as with proximity tracing, this does not necessarily mean that any party learns the identity or contact information of presence contacts.
+The system must provide the following functionalities.
 
-\paragraph{F1: Paper fallback option available} The system should support a paper-based fallback option for people that do not have, or do not want to use the smartphone application. 
+\paragraph{F1: Analog fallback option available} There should be a non-digital fallback for people that do not have, or do not want to use the smartphone application.
 
-\paragraph{F2: Presence contacts are notified} After a positive SARS-CoV-2 diagnosis for a person, all presence contacts should be notified. Since the SARS-CoV-2-positive user might have used the fallback, notification should be possible even if the SARS-CoV-2-positive user did not use the app (see F1).
+\paragraph{F2: Presence contacts are notified} All presence contacts at a trace location should be notified.
+Notification should be possible even if the SARS-CoV-2-positive user did not use the app. Following the principles of data-minimization, we do not require that any party learns the identity or contact information of presence contacts.
 
-\parait{Challenge:} Capturing exact arrival and departure time might conflict with usability (NF1). While informing the app of arrival should not be complicated, it seems more difficult to require another user action upon departure of a location. Automating departure measurements would seem to require access to sensors that conflict with NF2. Alternatively, the app can ask that users estimate for how long they are planning to stay at a location, or the app simply estimates the departure time (e.g., 2h after arrival or closing time).
+\parait{Challenge:} Capturing exact arrival and departure time might conflict with usability (NF1). While informing the app of arrival should not be complicated, it seems more difficult to require another user action upon departure of a location. Automating departure measurements seem to require access to sensors that conflict with NF2. Alternatively, the app can ask that users estimate for how long they are planning to stay at a location, set a reminder to ask the user to introduce the leaving time later on, or the app simply estimates the departure time (e.g., 2h after arrival or closing time).
 
-\paragraph{F3: Non-presence contacts are not notified} After a positive SARS-CoV-2 diagnosis for a person, any visitors to a location that do not have an epidemiologically relevant overlap with visits of the SARS-CoV-2-positive person are not notified.
-
-\parait{Challenge:} The need for this requirement depends on judgements made by local health authorities (e.g., taking into account the local situation, the need to be convervative/proactive, and the latest epidemiological insights).
-
-\parait{Challenge:} this property might be difficult to achieve, depending on how accurate time-keeping is and how accurate SARS-CoV-2-positive visitors (or their devices) can recall their visiting times. The default can be closing time. The app can also poll the user later, asking for the (approximate) departure time of the user. Or the app can ask the user only once it determines a potential overlap with a SARS-CoV-2-positive person.
+\paragraph{F3: Non-presence contacts are not notified} After a positive SARS-CoV-2 diagnosis for a person, any visitors to a location whose visit interval does not have an epidemiologically relevant overlap with visit(s) of the SARS-CoV-2-positive person are not notified. The need for this requirement depends on judgements made by local health authorities (e.g., taking into account the local situation, the need to be convervative/proactive, and the latest epidemiological insights).
 
 \subsection{Non-functional requirements}
+To ensure deployability, as well as effectiveness, the system must fulfill the following requirements.
+
 \paragraph{NF1: Ease of use for users} To ensure adoption, the system should be easy to use from a user’s perspective. And in particular no more complicated than base-line paper-based solutions.
 
 This requirement implies that when users have to scan QR codes, these should be small enough (in terms of the amount of data that they contain) that they can be reliably printed/displayed and then scanned by users’ devices.
 
+
 \paragraph{NF2: Easy deployment for locations} To ensure adoption of the system in a large number of locations, the system should not require (special) hardware at locations or server infrastructure managed by locations. 
 
-\paragraph{NF3: Speed of notification} After the SARS-CoV-2-positive user has completed the required steps --- for example, they informed the contact tracing team of which locations they visited --- any presence contacts should receive a notification quickly.
 
-\parait{Challenge:} background tasks of apps do not necessarily run frequently.
-While ``entering'' a location might bring the app to the foreground, and thus cause the OS to assign more background-time; this is not necessarily enough to pick up events days later from background tasks. It might be better therefore to integrate with existing proximity tracing apps.
+\paragraph{NF3: Speed of notification} After the health authority has determined a trace location, presence contacts at that location should receive a notification quickly.
 
-\paragraph{NF4: Small bandwidth and computation requirements} The system should have a small bandwidth and computation requirement on the side of the user.
+
+\paragraph{NF4: Small bandwidth and computation requirements} The system should have a small bandwidth and computation requirement on the side of the user. (And small user bandwidth implies manageable server bandwidth.)
+
 
 \subsection{Security/Privacy requirements}
+\label{sec:security-privacy-requirements}
+The following defines privacy requirements for visitors and trace locations, and security requirements.
 
+%%%%%%%%%%%%%%%
 \subsubsection{Privacy of users}
+We consider the following user-privacy requirements.
 
-\paragraph{PU1: No central collection of personal data} The presence-tracing system should not require the central collection of personal data (e.g., name, IP-address, e-mail address, telephone number, locations visited) of people that visit a location. Nor should the system be able to infer location or co-location data of either visitors or notified visitors.
+\paragraph{PU1: No central collection of personal data} The system should not require the central collection of personal data of visitors (e.g., name, IP-address, e-mail address, telephone number, locations visited). Nor should the system be able to infer location or co-location data of either visitors or notified visitors. This requirement implies that the backend server should not be able to deduce that a specific IP address visits a specific location. The health authority, however, needs to learn which locations a SARS-CoV-2-positive person visited.
 
-For the purpose of presence tracing, the health authority is allowed to learn which locations a SARS-CoV-2-positive person visited. 
+\paragraph{PU2: No collection of personal data at a location} The digital system should not require the location to collect personal data of visitors (e.g., name, e-mail address, telephone number) at the location. We make an exception for the paper-based fall-back approach.
 
-\parait{Corollary:} this requirement also implies that any central infrastructure used to facilitate the system (e.g., a server) should not be able to deduce that a specific IP address visits a specific location. 
-
-\paragraph{PU2: No collection of personal data at a location} The system should not require collecting at the location itself personal data (e.g., name, e-mail address, telephone number) of people that visited that location. The sole exception to this is the paper-based fall-back approach.
-
-\paragraph{PU3: No location confirmation attacks given phone} The system should hide which locations somebody has visited. PU1 and PU2 imply that this information should not be available centrally or at the location itself. This information should not be available to attackers that have access to the phone. In particular:
-\begin{itemize}
- \item The UI should not reveal which locations the user visited (e.g., to prevent (retroactive) location tracking by intimate partners and law enforcement).
- \item The data stored on the phone should not reveal or enable confirmation of visited locations to determined attackers (e.g., law enforcement). Such attackers can gain access to internal storage (i.e., information stored internally by the app), and can also be assumed to have visited specific locations.
+\paragraph{PU3: No location confirmation attacks} The system should not enable anyone to learn where a user has been. 
+PU1 and PU2 imply that this information should not be available centrally or at the location itself. This information should not be available even if an adversary (1) has access to the user's phone and its internal storage (e.g., law enforcement)
+and (2) can assume the user to have visited specific locations. In particular:
+\begin{itemize}[topsep=0pt, partopsep=0pt]
+\item The User Interface (UI) should not reveal which locations the user visited (e.g., to prevent location tracking by intimate partners~\cite{ChatterjeeDOHPF18,FreedPMLRD18,LevyS20} and law enforcement).
+ \item Data stored on the user's phone should not reveal or enable confirmation of visited locations except possibly for when the user should be notified, e.g., when they visited a trace location.
 \end{itemize}
- 
-\parait{Inherent limitation of decentralized systems.} In decentralized systems, the phone locally determines if the user should be notified. Therefore, such systems cannot prevent location confirmation attacks with trace locations.
+We note that if the phone locally determines whether the user should be notified, it is not possible to prevent location confirmation attacks if a user's visit to a trace locations coincides with the notification period (per F2, the user must be notified in this situation).
 
-\paragraph{PU4: Do not leak notifications through network traffic} The network traffic (if any) should not reveal that a specific user has been notified.
+\paragraph{PU4: Notification Privacy} No central server or network observer (if any) should be able to determine that a specific user has been notified.
 
-\paragraph{PU5: Do not leak SARS-CoV-2-positive status through network traffic} The network traffic (if any) should not reveal that a specific user has received a positive test result.
+\paragraph{PU5: SARS-CoV-2-positive status privacy} No central party or network observer other than the health authority, should be able to determine if a user has received a positive test result.
 
-\subsubsection{Confidentiality of locations}
-\paragraph{PL1: Hide which locations had a SARS-CoV-2-positive case from non-visitors} Attackers that never visited a location, should not be able to determine whether that location had a SARS-CoV-2-positive case.
+%%%%%%%%%%%%
+\subsubsection{Privacy of Locations}
+We consider the following privacy requirements for locations.
 
-\paragraph{PL2: Hide which locations had a SARS-CoV-2-positive case from non-contemporal visitors} An attacker that visited a location, but not during the time when a SARS-CoV-2-positive person was present, should not be able to determine whether that location had a SARS-CoV-2-positive case.
+\paragraph{PL1: Hide which locations had a SARS-CoV-2-positive case from non-visitors} Attackers that never visited a location (and do not collude with somebody who did) should not be able to determine whether that location had a SARS-CoV-2-positive case.
 
-\parait{Challenge:} this requirement is more tricky than PL1, as it requires that there is information that is only available to visitors around a specific time. This then implies active displays (or at least changing QR codes) to achieve.
+Attackers that do visit the location at the right time will learn, as they must be notified (because of the functional requirement F2). Therefore, anyone that colludes with a legitimate visitor will also learn whether a location is a trace location. In the extreme, it is possible to mount a coordinated attack to learn the status of many locations by visiting them.
 
-\parait{Inherent limitation:} No functional presence tracing system can hide that a location is positive from contemporal visitors of that location. This would be in direct violation of the core functional requirement that presence contacts are notified (F1).
+\paragraph{PL2: Hide which locations had a SARS-CoV-2-positive case from non-contemporal visitors} An attacker that visited a location, but not during the time when a SARS-CoV-2-positive person was present, should not be able to determine whether that location is a trace location.
 
-\paragraph{PL3: No new central database of locations/events} The system does not create (or rely on) a central database capturing information about all locations. This avoids creating a new database with events (e.g., political and religious gatherings) for the purpose of presence tracing.
+This requirement implies that there is information that is available to contemporal visitors, that is not available to non-contemporal visitors. \name does not achieve this property as it requires changing QR codes.
 
-\parait{Corollary:} this requirement also implies that organizers and owners should be able to produce the QR codes anonymously (e.g., using the Tor browser). 
+\paragraph{PL3: No new central database of locations} The system must not create (or rely on) a central database of information about locations.
 
+\parait{Corollary} This requirement also implies that organizers and owners should be able to produce the QR codes anonymously (e.g., using the Tor browser). 
+
+\paragraph{PL4: Hide locations triggering notification through network traffic}
+No network observe (if any) should be able to determine that a specific location has been asked to upload tracing information.
+
+%%%%%%
 \subsubsection{Security}
+We consider the following security requirements.
 
-\paragraph{S1: No fake notifications (targeting of users)} The system should make it impossible to target specific individuals, thereby causing them to be quarantined
+\paragraph{S1: No fake notifications (targeting of users)} The system should make it impossible to target specific individuals, thereby causing them to be quarantined.
 
-\paragraph{S2: No population control (targeting of locations)} The system should make it impossible to target sensitive locations (gay bar, biker hangout, bars/places-of-worship in specific neighbourhoods, etc.), thereby causing all the visitors to be quarantined.
-
-\parait{Inherent limitation.} If an infected person deliberately visits sensitive locations, the functional requirements imply that visitors of this location must be notified. So, at best, we can protect against people that did not visit a location.
-
-\parait{Confused deputies:} Because of requirement (F1), the system must accept locations self-reported by SARS-CoV-2-positive users. Therefore, a malicious SARS-CoV-2-positive user might use the system as a confused deputy to mark a location as a trace location, triggering notifications.
-
-The extent of this problem depends on when the health authorities mark a location as a trace location (e.g., does this require several reports) and whether health authorities can verify that the SARS-CoV-2-positive person was at the claimed location.
+\paragraph{S2: No population control (targeting of locations)} The system should make it difficult to target sensitive locations (gay bar, biker hangout, places of worship, 
+etc.), thereby causing all the visitors to be quarantined.
 
 \paragraph{S3: Automatic dismantling of the system}
-The dismantling of the system should not depend on central authorities to take action, e.g., to delete keys or data. Instead, as soon as users and location owners stop using the system, any remaining infrastructure should be automatically rendered useless.
+The dismantling of the system should not depend on central authorities to take action, e.g., to delete keys or data. Instead, as soon as users and location owners stop using the system, any remaining infrastructure should become automatically useless.
+
+\vspace{1mm}
+Requirement \textit{S2} is not be achievable in two situations. First, if an infected person deliberately visits sensitive locations: the functional requirements imply that visitors of this location must be notified.
+Second, a malicious diagnosed user might lie to the health authority about their past whereabouts, converting the health authority into a confused deputy that marks a ``clean'' location as a trace location. The extent of this problem depends on the mechanisms used by the health authorities to mark a location as a trace location (e.g., whether this requires several reports) and whether health authorities can verify that the SARS-CoV-2-positive person was at the claimed location.
+
+\subsection{Non goals}
+
+\name does not aim to achieve the following goals.
+
+\paragraph{Verification of attendance} The system does not aim to provide contact tracers with a proof that a user has been at a location. As a result, users might lie about where they have been, potentially violating S2.
+
+\paragraph{Enforcing quarantines} The system does not aim at providing authorities with the ability to enforce quarantine after notification. We assume that notified users will follow instructions from the health authorities with respect to the actions they should take.
+
+\paragraph{Preventing denial of service attacks} Presence tracing systems are usually susceptible to denial of service attacks by location owners and health authorities. Both of these parties can prevent visitors from being notified: the health authority can refuse to initiate tracing; and the legitimate owner can refuse to let users scan in (or provide the wrong information) and/or not provide contact information when asked.
+We leave denial of service attacks out of scope of technological protections. This illustrates the importance of establishing appropriate incentive structures around technological interventions.
