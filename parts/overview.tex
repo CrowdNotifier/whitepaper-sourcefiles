@@ -31,7 +31,7 @@ The following example illustrates the operation of the CrowdNotifier system. For
 
 In \name users store encrypted records for each visit on their phone. These
 records can only be decrypted using the decryption key for the corresponding
-time slot. Without this key, these records reveal noting, guaranteeing users'
+time slot. Without this key, these records reveal nothing, guaranteeing users'
 privacy against strong attackers. To initiate tracing, the health authority -- together with the location owner -- computes and publishes the proper time-slot specific decryption keys. Apps regularly download these keys and use them to try to unlock the encrypted records. If encryption succeeds, the user may need to be notified.
 
 To build this time-slot specific encryption system, \name uses an identity-based encryption (IBE) scheme. Each location owner acts as the trusted authority. In this setting, users store records of visits by encrypting against a time-based identity for the location they visit. The location owner with the health authority compute the corresponding identity-based decryption keys to enable tracing.
